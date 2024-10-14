@@ -1,0 +1,80 @@
+<head>
+    <title>Mining</title>
+    <link rel="icon" href="/wallet/logo.svg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="col bottom-back" ng-app="App" ng-controller="Controller">
+
+<div class="row header align-center">
+    <div class="row block align-start-center">
+        <div class="flex row align-center-center" style="margin-left: 40px">
+            <p>{{formatTicker(domain)}} Mining</p>
+        </div>
+        <img class="img40 p8 img-black ripple button black-back"
+             src="/wallet/img/settings.svg" ng-click="openSettings()">
+    </div>
+</div>
+<div class="flex col content scroll input-content">
+
+    <div class="col" ng-show="coin">
+        <ng-include src="'/wallet/card.html'"></ng-include>
+    </div>
+    <div class="col align-start-center"
+         style="background: url('/mfm-mining/consolesole/img/ellipse_13.svg'); background-size: cover;
+         padding-top: 60px">
+        <p class="size12 uppercase">Last reward</p>
+        <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
+        <p class="size12">{{formatAmount(balance, domain)}} in bank</p>
+        <p class="size10 gray300-text mt8">Difficulty {{difficulty}}</p>
+    </div>
+    <div class="col">
+        <div class="row align-center-center mb16">
+            <p>UI can be blocked while mining. Please be patient.</p>
+        </div>
+        <div class="row">
+            <md-progress-linear class="flex" md-mode="indeterminate" ng-show="inProgress"></md-progress-linear>
+        </div>
+        <div class="row">
+            <div class="flex primary-button" ng-click="startMining()"  ng-hide="inProgress">
+                Start
+            </div>
+            <div class="flex primary-button red-back" ng-click="stopMining()"  ng-show="inProgress">
+                Stop
+            </div>
+        </div>
+    </div>
+    <ng-include src="'/wallet/tran/trans.html'"></ng-include>
+</div>
+
+<script src="/node_modules/angular/angular.js"></script>
+<script src="/node_modules/angular-aria/angular-aria.js"></script>
+<script src="/node_modules/angular-animate/angular-animate.js"></script>
+<script src="/node_modules/angular-messages/angular-messages.js"></script>
+<script src="/node_modules/angular-material/angular-material.js"></script>
+<link href="/node_modules/angular-material/angular-material.min.css" rel="stylesheet">
+<script src="/node_modules/angular-material/angular-material.min.js"></script>
+
+<link href="/flex/flex.css" rel="stylesheet">
+<link href="/flex/shorts.css" rel="stylesheet">
+<link href="/flex/colors.css" rel="stylesheet">
+<link href="/flex/colors-dark.css" rel="stylesheet">
+<link href="/wallet/style.css" rel="stylesheet">
+
+<script src="/wallet/utils/formats.js"></script>
+<script src="/wallet/utils/backend.js"></script>
+<script src="/wallet/utils/ui.js"></script>
+
+<script src="controller.js"></script>
+<script>
+    controller(main)
+</script>
+
+<script async src="/mfm-mining/consolesole/settings/controller.js"></script>
+<script async src="/wallet/dialogs/success/controller.js"></script>
+<script async src="/wallet/dialogs/info/controller.js"></script>
+<script async src="/wallet/dialogs/pin/controller.js"></script>
+<script async src="/wallet/send/controller.js"></script>
+<script async src="/wallet/tran/controller.js"></script>
+
+</body>
