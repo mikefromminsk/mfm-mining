@@ -1,86 +1,119 @@
-function main($scope) {
+function openMining(domain, success) {
+    var worker;
+    if (domain == null) return;
+    showDialog('/mfm-mining/console/index.html', function () {
+            if (worker)
+                worker.terminate()
+            if (success)
+                success()
+        }, function ($scope) {
+            $scope.domain = domain
 
-    var domain = $scope.getUriParam("domain")
-    $scope.domain = domain
-
-    function init() {
-        loadProfile()
-        loadTrans()
-    }
-
-    function loadProfile() {
-        postContract("wallet", "api/profile.php", {
-            domain: domain,
-            address: wallet.address(),
-        }, function (response) {
-            $scope.coin = response
-            $scope.$apply()
-        })
-    }
-
-    var currentLastHash = "start"
-
-    function loadTrans() {
-        post("/wallet/api/trans_user.php", {
-            address: wallet.address(),
-            domain: domain,
-        }, function (response) {
-            $scope.trans = $scope.groupByTimePeriod(response.trans)
-            $scope.$apply()
-            loadInfo()
-        })
-    }
-
-    function loadInfo() {
-        postContract(domain,  "api/mining/info.php", {}, function (response) {
-            $scope.balance = response.balance
-            $scope.difficulty = response.difficulty
-            $scope.last_reward = response.last_reward
-            $scope.$apply()
-            if (currentLastHash != response.last_hash && $scope.inProgress) {
-                currentLastHash = response.last_hash
-                mint(domain, response.last_hash || "", response.difficulty)
-            }
-        })
-    }
-
-    async function mint(domain, last_hash, difficulty) {
-        for (let i = 0; i < 10000000000; i++) {
-            if (last_hash != currentLastHash || $scope.inProgress == false) return;
-            if (md5(last_hash + domain + i).substring(0, difficulty) === "0".repeat(difficulty)) {
-                postContractWithGas(domain, "api/mining/mint.php", {
-                    address: wallet.address(),
-                    nonce: i,
-                }, function (data) {
-                    init()
-                }, function () {
-
+            if (window.conn != null && window.conn.readyState !== WebSocket.OPEN) {
+                showInfoDialog("Your Websocket is not connected. "
+                    + "\nYou have less probabilities to mint.", function () {
                 })
-                break;
             }
-        }
-    }
 
-    $scope.startMining = function () {
-        openPin($scope.domain, function (pin) {
-            window.tempPin = pin
-            $scope.inProgress = true
+            function loadMiningInfo(startMiningAfterRequest) {
+                postContract("mfm-mining", "info.php", {
+                    domain: domain,
+                }, function (response) {
+                    $scope.balance = response.balance
+                    $scope.difficulty = response.difficulty
+                    $scope.last_reward = response.last_reward
+                    $scope.last_hash = response.last_hash
+                    $scope.$apply()
+                    if (startMiningAfterRequest)
+                        startMiningProcess(response.last_hash, response.difficulty)
+                })
+            }
+
+            $scope.startMining = function () {
+                hasBalance(wallet.gas_domain, function () {
+                    getPin(function (pin) {
+                        window.tempPin = pin
+                        $scope.inProgress = true
+                        loadMiningInfo(true)
+                    })
+                });
+            }
+
+
+            function startMiningProcess(last_hash, difficulty) {
+                if (worker != null)
+                    worker.terminate()
+                worker = new Worker('/mfm-mining/console/worker.js');
+                worker.addEventListener('message', function (e) {
+                    if ($scope.last_hash == e.data.last_hash){
+                        postContractWithGas("mfm-mining", "mint.php", {
+                            domain: domain,
+                            nonce: e.data.nonce,
+                            str: e.data.str,
+                            hash: e.data.hash,
+                            last_hash: e.data.last_hash,
+                        }, function () {
+                            loadMiningInfo(true)
+                        }, function () {
+                            loadMiningInfo(true)
+                        })
+                    } else {
+                        loadMiningInfo(true)
+                    }
+                });
+                worker.postMessage({
+                    domain: domain,
+                    last_hash: last_hash,
+                    difficulty: difficulty,
+                });
+            }
+
+            $scope.stopMining = function () {
+                $scope.inProgress = false
+            }
+
+            $scope.subscribe("mining", function (data) {
+                if (data.domain == domain) {
+                    $scope.difficulty = data.difficulty
+                    $scope.last_reward = data.reward
+                    $scope.$apply()
+                    startMiningProcess(data.last_hash, data.difficulty)
+                }
+            })
+
+            function loadProfile() {
+                postContract("mfm-token", "profile.php", {
+                    domain: domain,
+                    address: wallet.address(),
+                }, function (response) {
+                    $scope.coin = response
+                    $scope.$apply()
+                })
+            }
+
+            function loadTrans() {
+                /*post("/wallet/api/trans_user.php", {
+                    address: wallet.address(),
+                    domain: domain,
+                }, function (response) {
+                    $scope.trans = $scope.groupByTimePeriod(response.trans)
+                    $scope.$apply()
+                    loadInfo()
+                })*/
+            }
+
+            $scope.openTran = function (tran) {
+                openTran(tran.next_hash)
+            }
+
+            function init() {
+                loadProfile()
+                loadTrans()
+                loadMiningInfo()
+            }
+
             init()
-        })
-    }
+        }
+    )
 
-    $scope.stopMining = function () {
-        $scope.inProgress = false
-    }
-
-    $scope.openSettings = function () {
-        $scope.inProgress = false
-        openSettings(domain, init)
-    }
-
-    $scope.openTran = function (tran) {
-        openTran(tran.next_hash)
-    }
-
-    init()
 }
