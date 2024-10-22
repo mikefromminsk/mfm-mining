@@ -1,21 +1,21 @@
-<md-dialog class="col fill">
+<md-dialog class="fill col block">
     <div class="row header align-start-center">
         <img class="ripple" src="/mfm-wallet/img/back.svg" ng-click="close()">
-        <p>Mining</p>
+        <div class="row flex align-start-center">
+            <img ng-style="getLogo(domain)">
+            <p class="ml4">{{formatTicker(domain)}} mining</p>
+        </div>
     </div>
     <div class="flex col content scroll input-content">
         <div class="col align-start-center"
-             style="background: url('/mfm-mining/consolesole/img/ellipse_13.svg'); background-size: cover;
+             style="background: url('/mfm-mining/console/img/ellipse_13.svg'); background-size: cover;
          padding-top: 60px">
             <p class="size12 uppercase">Last reward</p>
             <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
             <p class="size12">{{formatAmount(balance, domain)}} in bank</p>
-            <p class="size10 gray300-text mt8">Difficulty {{difficulty}}</p>
+            <p class="size10 mt8">Difficulty {{difficulty}}</p>
         </div>
         <div class="col">
-            <div class="row align-center-center mb16">
-                <p>UI can be blocked while mining. Please be patient.</p>
-            </div>
             <div class="row">
                 <md-progress-linear class="flex" md-mode="indeterminate" ng-show="inProgress"></md-progress-linear>
             </div>
@@ -29,6 +29,8 @@
             </div>
         </div>
         <!--<ng-include src="'/wallet/tran/trans.html'"></ng-include>-->
+
+        <div class="nowrap-disabled" id="mfm-mining-readme"></div>
     </div>
 
 </md-dialog>

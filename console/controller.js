@@ -39,7 +39,6 @@ function openMining(domain, success) {
                 });
             }
 
-
             function startMiningProcess(last_hash, difficulty) {
                 if (worker != null)
                     worker.terminate()
@@ -69,11 +68,14 @@ function openMining(domain, success) {
             }
 
             $scope.stopMining = function () {
+                if (worker != null)
+                    worker.terminate()
                 $scope.inProgress = false
             }
 
             $scope.subscribe("mining", function (data) {
                 if (data.domain == domain) {
+                    $scope.balance = data.balance
                     $scope.difficulty = data.difficulty
                     $scope.last_reward = data.reward
                     $scope.$apply()
@@ -110,6 +112,7 @@ function openMining(domain, success) {
                 loadProfile()
                 loadTrans()
                 loadMiningInfo()
+                loadMarkdown("mfm-mining-readme", "/mfm-mining/readme.md")
             }
 
             init()
