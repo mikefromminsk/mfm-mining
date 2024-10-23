@@ -2,7 +2,7 @@
 include_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-data/utils.php";
 
 $gas_address = get_required(gas_address);
-$nonce = get_required(nonce);
+$nonce = get_int_required(nonce);
 
 $domain = get_required(domain);
 
@@ -18,17 +18,18 @@ $response[str] = $str;
 $response[new_hash] = $new_hash;
 $response[last_hash] = $last_hash;
 
-if (substr($new_hash, 0, $difficulty) == str_repeat("0", $difficulty)) {
+$gmp = gmp_init("0x$new_hash");
+$gmp = gmp_div_r($gmp, $difficulty);
+
+if (gmp_strval($gmp) == "0") {
     $token_balance = tokenBalance($domain, mining);
     $reward = round($token_balance * 0.001, 2);
     tokenSend($domain, mining, $gas_address, $reward);
     $timeDist = time() - dataInfo([mining, $domain, last_hash])[data_time];
-    if ($timeDist < 3) {
-        $new_difficulty = $difficulty + 1;
-        if ($new_difficulty > 5)
-            $new_difficulty = 5;
-    } else if ($timeDist > 60) {
-        $new_difficulty = $difficulty - 1;
+    if ($timeDist < 10) {
+        $new_difficulty = $difficulty + 1000000;
+    } else {
+        $new_difficulty = $difficulty - 1000000;
     }
     if ($new_difficulty != null)
         dataSet([mining, $domain, difficulty], $new_difficulty);

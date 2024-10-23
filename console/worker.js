@@ -6,8 +6,9 @@ addEventListener('message', function (e) {
     for (let i = 0; i >= 0; i++) {
         let nonce = Math.floor(Math.random() * 100000000)
         //if (last_hash != currentLastHash || $scope.inProgress == false) return;
-        if (CryptoJS.MD5(last_hash + domain + nonce).toString()
-            .substring(0, difficulty) === "0".repeat(difficulty)) {
+        let hash = CryptoJS.MD5(last_hash + domain + nonce).toString()
+        let hashNumber = new Number("0x" + hash);
+        if (hashNumber % difficulty == 0) {
             postMessage({
                 nonce: nonce,
                 last_hash: last_hash,
