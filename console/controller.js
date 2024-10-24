@@ -94,14 +94,13 @@ function openMining(domain, success) {
             }
 
             function loadTrans() {
-                /*post("/wallet/api/trans_user.php", {
+                post("/mfm-token/trans.php", {
                     address: wallet.address(),
                     domain: domain,
                 }, function (response) {
                     $scope.trans = $scope.groupByTimePeriod(response.trans)
                     $scope.$apply()
-                    loadInfo()
-                })*/
+                })
             }
 
             $scope.openTran = function (tran) {
