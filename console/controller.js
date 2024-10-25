@@ -111,7 +111,6 @@ function openMining(domain, success) {
                 loadProfile()
                 loadTrans()
                 loadMiningInfo()
-
                 get("/mfm-mining/readme.md", function (text) {
                     setMarkdown("mfm-mining-readme", text)
                 })
