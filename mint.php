@@ -1,5 +1,5 @@
 <?php
-include_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-data/utils.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-data/utils.php";
 
 $gas_address = get_required(gas_address);
 $nonce = get_int_required(nonce);
