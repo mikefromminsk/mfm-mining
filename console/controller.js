@@ -10,9 +10,7 @@ function openMining(domain, success) {
             $scope.domain = domain
 
             if (window.conn != null && window.conn.readyState !== WebSocket.OPEN) {
-                showInfoDialog("Your Websocket is not connected. "
-                    + "\nYou have less probabilities to mint.", function () {
-                })
+                showError("Your Websocket is not connected.")
             }
 
             function loadMiningInfo(startMiningAfterRequest) {
@@ -30,7 +28,7 @@ function openMining(domain, success) {
             }
 
             $scope.startMining = function () {
-                hasBalance(wallet.gas_domain, function () {
+                hasGas(function () {
                     getPin(function (pin) {
                         window.tempPin = pin
                         $scope.inProgress = true
