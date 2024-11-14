@@ -28,13 +28,11 @@ function openMining(domain, success) {
             }
 
             $scope.startMining = function () {
-                hasGas(function () {
-                    getPin(function (pin) {
-                        window.tempPin = pin
-                        $scope.inProgress = true
-                        loadMiningInfo(true)
-                    })
-                });
+                getPin(function (pin) {
+                    window.tempPin = pin
+                    $scope.inProgress = true
+                    loadMiningInfo(true)
+                })
             }
 
             function startMiningProcess(last_hash, difficulty) {
@@ -42,17 +40,19 @@ function openMining(domain, success) {
                     worker.terminate()
                 worker = new Worker('/mfm-mining/console/worker.js');
                 worker.addEventListener('message', function (e) {
-                    if ($scope.last_hash == e.data.last_hash){
-                        postContractWithGas("mfm-mining", "mint.php", {
-                            domain: domain,
-                            nonce: e.data.nonce,
-                            str: e.data.str,
-                            hash: e.data.hash,
-                            last_hash: e.data.last_hash,
-                        }, function () {
-                            loadMiningInfo(true)
-                        }, function () {
-                            loadMiningInfo(true)
+                    if ($scope.last_hash == e.data.last_hash) {
+                        calcPass(domain, window.tempPin, function (pass) {
+                            postContractWithGas("mfm-mining", "mint.php", {
+                                domain: domain,
+                                nonce: e.data.nonce,
+                                str: e.data.str,
+                                hash: e.data.hash,
+                                last_hash: e.data.last_hash,
+                            }, function () {
+                                loadMiningInfo(true)
+                            }, function () {
+                                loadMiningInfo(true)
+                            })
                         })
                     } else {
                         loadMiningInfo(true)
