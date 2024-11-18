@@ -2,7 +2,7 @@
     <div class="row header align-start-center">
         <img class="ripple" src="/mfm-wallet/img/back.svg" ng-click="close()">
         <div class="flex row align-start-center">
-            <img ng-style="getLogo(domain)">
+            <div ng-style="getLogo(domain)"></div>
             <p class="ml4">{{formatTicker(domain)}} mining</p>
         </div>
     </div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <ng-include src="'/mfm-wallet/token/trans/trans.html'"></ng-include>
+        <ng-include src="'/mfm-wallet/trans/trans.html'"></ng-include>
 
         <div class="nowrap-disabled" id="mfm-mining-readme"></div>
     </div>
