@@ -12,18 +12,18 @@
         <div class="col mh16 align-start-center"
              style="background: url('/mfm-mining/console/img/ellipse_13.svg'); background-size: cover;
          padding-top: 60px">
-            <p class="size12 uppercase">Last reward</p>
+            <p class="size12 uppercase">{{str.last_reward}}</p>
             <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
-            <p class="size12">{{formatAmount(balance, domain)}} in bank</p>
-            <p class="size10 mt8">Difficulty {{difficulty}}</p>
+            <p class="size12">{{formatAmount(balance, domain)}} {{str.in_bank}}</p>
+            <p class="size10 mt8">{{str.difficulty}} {{difficulty}}</p>
         </div>
         <div class="col">
             <div class="row">
                 <div class="flex primary-button" ng-click="startMining()" ng-hide="inProgress">
-                    Start
+                    {{str.start}}
                 </div>
                 <div class="flex primary-button back-red" ng-click="stopMining()" ng-show="inProgress">
-                    Stop
+                    {{str.stop}}
                 </div>
             </div>
         </div>
