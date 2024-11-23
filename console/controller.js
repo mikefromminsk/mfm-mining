@@ -101,10 +101,6 @@ function openMining(domain, success) {
                 })
             }
 
-            $scope.openTran = function (tran) {
-                openTran(tran.next_hash)
-            }
-
             function init() {
                 loadProfile()
                 loadTrans()
