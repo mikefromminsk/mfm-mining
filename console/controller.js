@@ -82,10 +82,7 @@ function openMining(domain, success) {
             })
 
             function loadProfile() {
-                postContract("mfm-token", "profile.php", {
-                    domain: domain,
-                    address: wallet.address(),
-                }, function (response) {
+                getProfile(domain, function (response) {
                     $scope.coin = response
                     $scope.$apply()
                 })
