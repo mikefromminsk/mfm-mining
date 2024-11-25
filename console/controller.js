@@ -1,5 +1,5 @@
-function openMining(domain, success) {
-    var worker;
+ function openMining(domain, success) {
+    let worker;
     if (domain == null) return;
     showDialog('/mfm-mining/console/index.html', function () {
             if (worker)
@@ -8,6 +8,7 @@ function openMining(domain, success) {
                 success()
         }, function ($scope) {
             $scope.domain = domain
+            $scope.speed = 0
 
             if (window.conn != null && window.conn.readyState !== WebSocket.OPEN) {
                 showError("Your Websocket is not connected.")
@@ -16,11 +17,14 @@ function openMining(domain, success) {
             function loadMiningInfo(startMiningAfterRequest) {
                 postContract("mfm-mining", "info.php", {
                     domain: domain,
+                    address: wallet.address(),
                 }, function (response) {
                     $scope.balance = response.balance
                     $scope.difficulty = response.difficulty
                     $scope.last_reward = response.last_reward
                     $scope.last_hash = response.last_hash
+                    $scope.round_seconds = response.round_seconds
+                    $scope.gas_balance = response.gas_balance
                     $scope.$apply()
                     if (startMiningAfterRequest)
                         startMiningProcess(response.last_hash, response.difficulty)
@@ -28,10 +32,19 @@ function openMining(domain, success) {
             }
 
             $scope.startMining = function () {
-                getPin(function (pin) {
-                    window.tempPin = pin
-                    $scope.inProgress = true
-                    loadMiningInfo(true)
+                postContract("mfm-token", "account.php", {
+                    domain: wallet.gas_domain,
+                    address: wallet.address(),
+                }, function (response) {
+                    if (response.balance > 0){
+                        getPin(function (pin) {
+                            window.tempPin = pin
+                            $scope.inProgress = true
+                            loadMiningInfo(true)
+                        })
+                    } else {
+                        openAskCredit(wallet.gas_domain)
+                    }
                 })
             }
 
@@ -40,6 +53,7 @@ function openMining(domain, success) {
                     worker.terminate()
                 worker = new Worker('/mfm-mining/console/worker.js');
                 worker.addEventListener('message', function (e) {
+                    $scope.speed = e.data.speed
                     if ($scope.last_hash == e.data.last_hash) {
                         calcPass(domain, window.tempPin, function (pass) {
                             postContractWithGas("mfm-mining", "mint.php", {
@@ -50,8 +64,13 @@ function openMining(domain, success) {
                                 last_hash: e.data.last_hash,
                             }, function () {
                                 loadMiningInfo(true)
-                            }, function () {
-                                loadMiningInfo(true)
+                            }, function (message) {
+                                if (message.indexOf("balance is not enough") !== -1){
+                                    showError(message)
+                                    $scope.stopMining()
+                                } else {
+                                    loadMiningInfo(true)
+                                }
                             })
                         })
                     } else {
@@ -107,6 +126,9 @@ function openMining(domain, success) {
                 })
             }
 
+            setTimeout(function () {
+                startRainbow("rainbow")
+            }, 100)
             init()
         }
     )

@@ -9,17 +9,22 @@
         </div>
     </div>
     <div class="flex col content scroll">
-        <div class="col mh16 align-start-center"
-             style="background: url('/mfm-mining/console/img/ellipse_13.svg'); background-size: cover;
+        <div class="col mh16 align-start-center "
+             style="background: url('/mfm-mining/console/img/ellipse_13.svg'); background-size: 100% 100%;
          padding-top: 60px">
             <p class="size12 uppercase">{{str.last_reward}}</p>
             <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
             <p class="size12">{{formatAmount(balance, domain)}} {{str.in_bank}}</p>
-            <p class="size10 mt8">{{str.difficulty}} {{difficulty}}</p>
+            <p class="size10 mt8">{{str.difficulty}} {{formatAmount(difficulty, str.hashes, 0)}}</p>
+            <p class="size10 mt8">{{str.round}} {{formatAmount(round_seconds, str.second, 0)}}</p>
+            <p class="size10 mt8">{{str.speed}} {{formatAmount(speed, str.hashes, 0)}}</p>
         </div>
         <div class="col">
             <div class="row">
-                <div class="flex primary-button" ng-click="startMining()" ng-hide="inProgress">
+                <div class="flex primary-button"
+                     ng-click="startMining()"
+                     ng-disabled="balance == 0"
+                     ng-hide="inProgress">
                     {{str.start}}
                 </div>
                 <div class="flex primary-button back-red" ng-click="stopMining()" ng-show="inProgress">
@@ -27,6 +32,10 @@
                 </div>
             </div>
         </div>
+        <div class="col align-center-center">
+            <p class="size10 mt8">{{str.available}} {{formatAmount(gas_balance, wallet.gas_domain)}}</p>
+        </div>
+
         <ng-include src="'/mfm-wallet/trans/trans.html'"></ng-include>
 
         <div class="nowrap-disabled mh16" id="mfm-mining-readme"></div>

@@ -1,12 +1,20 @@
 <?php
-require_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-data/utils.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-mining/utils.php";
 
 $gas_address = get_required(gas_address);
 $nonce = get_int_required(nonce);
+$round_reward_percent = get_int_required(round_reward_percent);
+$round_seconds = get_int_required(round_seconds);
 
 $domain = get_required(domain);
 
 tokenRegScript($domain, mining, "mfm-mining/mint.php");
+
+$token_balance = tokenBalance($domain, mining);
+
+if ($token_balance < 1) {
+    error("Mining bank is empty");
+}
 
 $last_hash = dataGet([mining, $domain, last_hash]) ?: "";
 $difficulty = dataGet([mining, $domain, difficulty]) ?: 1;
@@ -22,14 +30,16 @@ $gmp = gmp_init("0x$new_hash");
 $gmp = gmp_div_r($gmp, $difficulty);
 
 if (gmp_strval($gmp) == "0") {
-    $token_balance = tokenBalance($domain, mining);
-    $reward = round($token_balance * 0.001, 2);
+    $reward = round($token_balance * $round_reward_percent, 2);
     tokenSend($domain, mining, $gas_address, $reward);
     $timeDist = time() - dataInfo([mining, $domain, last_hash])[data_time];
-    if ($timeDist < 10) {
+    if ($timeDist < $round_seconds) {
         $new_difficulty = $difficulty + 1000000;
     } else {
         $new_difficulty = $difficulty - 1000000;
+    }
+    if ($new_difficulty < 1) {
+        $new_difficulty = 1;
     }
     if ($new_difficulty != null)
         dataSet([mining, $domain, difficulty], $new_difficulty);
