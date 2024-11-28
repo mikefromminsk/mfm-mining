@@ -43,7 +43,7 @@
                             loadMiningInfo(true)
                         })
                     } else {
-                        openAskCredit(wallet.gas_domain)
+                        openAskCredit(wallet.gas_domain, init)
                     }
                 })
             }
