@@ -16,25 +16,27 @@
                 <p class="size12 uppercase">{{str.last_reward}}</p>
                 <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
                 <p class="size12">{{formatAmount(balance, domain)}} {{str.in_bank}}</p>
-                <p class="size10 mt8">{{str.difficulty}} {{formatAmount(difficulty, str.hashes, 0)}}</p>
-                <p class="size10 mt8">{{str.round}} {{formatAmount(round_seconds, str.second, 0)}}</p>
-                <p class="size10 mt8">{{str.speed}} {{formatAmount(speed, str.hashes, 0)}}</p>
+                <p class="size10 mt8">{{str.difficulty}} {{formatAmount(difficulty)}}</p>
+                <p class="size10 mt8">{{str.round}} {{formatAmount(round_seconds)}}</p>
+                <p class="size10 mt8">{{str.speed}} {{formatAmount(speed)}}</p>
             </div>
             <div class="col">
                 <div class="row">
                     <div class="flex primary-button"
                          ng-click="startMining()"
                          ng-disabled="balance == 0"
-                         ng-hide="inProgress">
+                         ng-hide="in_progress">
                         {{str.start}}
                     </div>
-                    <div class="flex primary-button back-red" ng-click="stopMining()" ng-show="inProgress">
+                    <div class="flex primary-button back-red"
+                         ng-click="stopMining()"
+                         ng-show="in_progress">
                         {{str.stop}}
                     </div>
                 </div>
             </div>
-            <div class="col align-center-center">
-                <p class="size10 mt8">{{str.available}} {{formatAmount(gas_balance, wallet.gas_domain)}}</p>
+            <div class="col mh16 mt16">
+                <ng-include src="'/mfm-wallet/wallet/accounts.html?nocache'"></ng-include>
             </div>
 
             <ng-include src="'/mfm-wallet/trans/trans.html'"></ng-include>

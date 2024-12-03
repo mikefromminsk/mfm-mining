@@ -9,7 +9,7 @@ $response[last_hash] = dataGet([mining, $domain, last_hash]) ?: "";
 $response[difficulty] = dataGet([mining, $domain, difficulty]) ?: 1;
 
 $response[balance] = tokenBalance($domain, mining);
-$response[last_reward] = tokenLastTran($domain, mining)[amount];
+$response[last_reward] = getReward($domain);
 $response[round_seconds] = get_int_required(round_seconds);
 $response[gas_balance] = tokenBalance($gas_domain, $address);
 

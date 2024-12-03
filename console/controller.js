@@ -1,4 +1,4 @@
- function openMining(domain, success) {
+function openMining(domain, success) {
     let worker;
     if (domain == null) return;
     showDialog('/mfm-mining/console/index.html', function () {
@@ -26,7 +26,7 @@
                     $scope.round_seconds = response.round_seconds
                     $scope.gas_balance = response.gas_balance
                     $scope.$apply()
-                    if (startMiningAfterRequest)
+                    if ($scope.in_progress && startMiningAfterRequest)
                         startMiningProcess(response.last_hash, response.difficulty)
                 })
             }
@@ -36,10 +36,10 @@
                     domain: wallet.gas_domain,
                     address: wallet.address(),
                 }, function (response) {
-                    if (response.balance > 0){
+                    if (response.balance > 0) {
                         getPin(function (pin) {
-                            window.tempPin = pin
-                            $scope.inProgress = true
+                            window.pinForSesstion = pin
+                            $scope.in_progress = true
                             loadMiningInfo(true)
                         })
                     } else {
@@ -55,23 +55,21 @@
                 worker.addEventListener('message', function (e) {
                     $scope.speed = e.data.speed
                     if ($scope.last_hash == e.data.last_hash) {
-                        calcPass(domain, window.tempPin, function (pass) {
-                            postContractWithGas("mfm-mining", "mint.php", {
-                                domain: domain,
-                                nonce: e.data.nonce,
-                                str: e.data.str,
-                                hash: e.data.hash,
-                                last_hash: e.data.last_hash,
-                            }, function () {
+                        postContractWithGas("mfm-mining", "mint.php", {
+                            domain: domain,
+                            nonce: e.data.nonce,
+                            str: e.data.str,
+                            hash: e.data.hash,
+                            last_hash: e.data.last_hash,
+                        }, function () {
+                            loadMiningInfo(true)
+                        }, function (message) {
+                            if (message.indexOf("Invalid nonce") !== -1) {
                                 loadMiningInfo(true)
-                            }, function (message) {
-                                if (message.indexOf("balance is not enough") !== -1){
-                                    showError(message)
-                                    $scope.stopMining()
-                                } else {
-                                    loadMiningInfo(true)
-                                }
-                            })
+                            } else {
+                                showError(message)
+                                $scope.stopMining()
+                            }
                         })
                     } else {
                         loadMiningInfo(true)
@@ -87,7 +85,7 @@
             $scope.stopMining = function () {
                 if (worker != null)
                     worker.terminate()
-                $scope.inProgress = false
+                $scope.in_progress = false
             }
 
             $scope.subscribe("mining", function (data) {
@@ -107,9 +105,21 @@
                 })
             }
 
+            postContract("mfm-token", "accounts.php", {
+                address: wallet.address(),
+            }, function (response) {
+                let accounts = []
+                for (const account of response.accounts)
+                    if (account.domain == domain || account.domain == wallet.gas_domain)
+                        accounts.push(account)
+                $scope.accounts = accounts
+                $scope.$apply()
+            })
+
             function loadTrans() {
                 post("/mfm-token/trans.php", {
-                    address: wallet.address(),
+                    from_address: "mining",
+                    to_address: wallet.address(),
                     domain: domain,
                 }, function (response) {
                     $scope.trans = $scope.groupByTimePeriod(response.trans)

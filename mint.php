@@ -3,18 +3,11 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-mining/utils.php";
 
 $gas_address = get_required(gas_address);
 $nonce = get_int_required(nonce);
-$round_reward_percent = get_int_required(round_reward_percent);
 $round_seconds = get_int_required(round_seconds);
 
 $domain = get_required(domain);
 
 tokenRegScript($domain, mining, "mfm-mining/mint.php");
-
-$token_balance = tokenBalance($domain, mining);
-
-if ($token_balance < 1) {
-    error("Mining bank is empty");
-}
 
 $last_hash = dataGet([mining, $domain, last_hash]) ?: "";
 $difficulty = dataGet([mining, $domain, difficulty]) ?: 1;
@@ -30,7 +23,7 @@ $gmp = gmp_init("0x$new_hash");
 $gmp = gmp_div_r($gmp, $difficulty);
 
 if (gmp_strval($gmp) == "0") {
-    $reward = round($token_balance * $round_reward_percent, 2);
+    $reward = getReward($domain);
     tokenSend($domain, mining, $gas_address, $reward);
     $timeDist = time() - dataInfo([mining, $domain, last_hash])[data_time];
     if ($timeDist < $round_seconds) {
@@ -51,7 +44,6 @@ if (gmp_strval($gmp) == "0") {
         last_hash => $last_hash,
         reward => $reward,
         address => $gas_address,
-        balance => $token_balance - $reward
     ]);
 } else {
     error("Invalid nonce", $response);
