@@ -11,14 +11,50 @@
     <div class="flex col scroll">
         <div class="flex col block">
             <div class="col mh16 align-start-center"
-                 style="background: url('/mfm-mining/console/img/ellipse_13.svg'); background-size: 100% 100%;
-         padding-top: 60px">
+                 style="position: relative; padding-top: 100px">
                 <p class="size12 uppercase">{{str.last_reward}}</p>
-                <p class="size40 bold">{{formatAmount(last_reward, domain)}}</p>
-                <p class="size12">{{formatAmount(balance, domain)}} {{str.in_bank}}</p>
+                <p class="size40 bold">{{formatAmount(last_reward, domain, 0)}}</p>
+                <p class="size12">{{formatAmount(bank, domain)}} {{str.in_bank}}</p>
                 <p class="size10 mt8">{{str.difficulty}} {{formatAmount(difficulty)}}</p>
-                <p class="size10 mt8">{{str.round}} {{formatAmount(round_seconds)}}</p>
-                <p class="size10 mt8">{{str.speed}} {{formatAmount(speed)}}</p>
+                <p class="size10 mt8">{{str.speed}} {{formatAmount(speed)}} h/s</p>
+
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="100 100 800 500" xml:space="preserve">
+<!-- Stroke ring -->
+<circle class="st0" cx="500" cy="500" r="302.8">
+  <animateTransform attributeType="xml"
+                    attributeName="transform"
+                    type="rotate"
+                    from="0 500 500"
+                    to="360 500 500"
+                    dur="100s"
+                    repeatCount="indefinite"/>
+</circle>
+                    <!-- Inner ring -->
+                    <circle class="st1" cx="500" cy="500" r="237.7">
+    <animateTransform attributeType="xml"
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 500 500"
+                      to="360 500 500"
+                      dur="40s"
+                      repeatCount="indefinite"/>
+</circle>
+                    <!-- Outer ring -->
+                    <circle class="st2" cx="500" cy="500" r="366.8" transform="rotate(0 500 500)" ;>
+  <animateTransform attributeType="xml"
+                    attributeName="transform"
+                    type="rotate"
+                    from="0 500 500"
+                    to="-360 500 500"
+                    dur="50s"
+                    repeatCount="indefinite"/>
+</circle>
+                    <!-- Outer thin ring -->
+                    <circle class="st3" cx="500" cy="500" r="385.1"/>
+</svg>
+
             </div>
             <div class="col">
                 <div class="row">

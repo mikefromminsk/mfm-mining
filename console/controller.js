@@ -19,16 +19,15 @@ function openMining(domain, success) {
                     domain: domain,
                     address: wallet.address(),
                 }, function (response) {
-                    $scope.balance = response.balance
                     $scope.difficulty = response.difficulty
                     $scope.last_reward = response.last_reward
                     $scope.last_hash = response.last_hash
-                    $scope.round_seconds = response.round_seconds
-                    $scope.gas_balance = response.gas_balance
+                    $scope.bank = response.bank
                     $scope.$apply()
                     if ($scope.in_progress && startMiningAfterRequest)
                         startMiningProcess(response.last_hash, response.difficulty)
                 })
+                loadAccounts()
             }
 
             $scope.startMining = function () {
@@ -105,16 +104,18 @@ function openMining(domain, success) {
                 })
             }
 
-            postContract("mfm-token", "accounts.php", {
-                address: wallet.address(),
-            }, function (response) {
-                let accounts = []
-                for (const account of response.accounts)
-                    if (account.domain == domain || account.domain == wallet.gas_domain)
-                        accounts.push(account)
-                $scope.accounts = accounts
-                $scope.$apply()
-            })
+            function loadAccounts() {
+                postContract("mfm-token", "accounts.php", {
+                    address: wallet.address(),
+                }, function (response) {
+                    let accounts = []
+                    for (const account of response.accounts)
+                        if (account.domain == domain || account.domain == wallet.gas_domain)
+                            accounts.push(account)
+                    $scope.accounts = accounts
+                    $scope.$apply()
+                })
+            }
 
             function loadTrans() {
                 post("/mfm-token/trans.php", {
@@ -131,6 +132,7 @@ function openMining(domain, success) {
                 loadProfile()
                 loadTrans()
                 loadMiningInfo()
+                loadAccounts()
                 get("/mfm-mining/readme.md", function (text) {
                     setMarkdown("mfm-mining-readme", text)
                 })

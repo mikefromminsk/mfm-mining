@@ -7,10 +7,7 @@ $gas_domain = get_required(gas_domain);
 
 $response[last_hash] = dataGet([mining, $domain, last_hash]) ?: "";
 $response[difficulty] = dataGet([mining, $domain, difficulty]) ?: 1;
-
-$response[balance] = tokenBalance($domain, mining);
+$response[bank] = tokenBalance($domain, mining);
 $response[last_reward] = getReward($domain);
-$response[round_seconds] = get_int_required(round_seconds);
-$response[gas_balance] = tokenBalance($gas_domain, $address);
 
 commit($response);

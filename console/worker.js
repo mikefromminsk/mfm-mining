@@ -15,7 +15,7 @@ addEventListener('message', function (e) {
                 last_hash: last_hash,
                 str: last_hash + domain + nonce,
                 hash: CryptoJS.MD5(last_hash + domain + nonce).toString(),
-                speed: i / (new Date().getTime() - startTime),
+                speed: i / (new Date().getTime() - startTime) * 1000,
             });
             break;
         }
