@@ -3,7 +3,6 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/mfm-mining/utils.php";
 
 $gas_address = get_required(gas_address);
 $nonce = get_int_required(nonce);
-$round_seconds = get_int_required(round_seconds);
 
 $domain = get_required(domain);
 
@@ -25,22 +24,41 @@ $gmp = gmp_div_r($gmp, $difficulty);
 if (gmp_strval($gmp) == "0") {
     $reward = getReward($domain);
     tokenSend($domain, mining, $gas_address, $reward);
-    $timeDist = time() - dataInfo([mining, $domain, last_hash])[data_time];
-    if ($timeDist < $round_seconds) {
-        $new_difficulty = $difficulty + 1000000;
-    } else {
-        $new_difficulty = $difficulty - 1000000;
+    $interval = time() - dataInfo([mining, $domain, last_hash])[data_time];
+    $need_interval = 5;
+    $time_diff = $interval - $need_interval;
+
+    $axelerate = 0;
+    $difficulty_history = dataHistory([mining, $domain, difficulty], 0, 20);
+    for ($i = 1; $i < sizeof($difficulty_history); $i++) {
+        if ($difficulty_history[$i] > $difficulty_history[$i - 1])
+            $axelerate += 1;
+        if ($difficulty_history[$i] < $difficulty_history[$i - 1])
+            $axelerate -= 1;
     }
-    if ($new_difficulty < 1) {
-        $new_difficulty = 1;
+    if ($time_diff > 0) {
+        $axelerate += 1;
+    } else if ($time_diff < 0) {
+        $axelerate -= 1;
     }
-    if ($new_difficulty != null)
-        dataSet([mining, $domain, difficulty], $new_difficulty);
+
+    $difficulty_diff = pow(2, abs($axelerate));
+
+    if ($time_diff == 0) {
+        $difficulty_diff = 0;
+    } else if ($time_diff > 0) {
+        $difficulty_diff = -$difficulty_diff;
+    }
+    $difficulty += $difficulty_diff;
+    if ($difficulty < 1) {
+        $difficulty = 1;
+    }
+    dataSet([mining, $domain, difficulty], $difficulty);
     dataSet([mining, $domain, last_hash], $new_hash);
 
     broadcast(mining, [
         domain => $domain,
-        difficulty => $new_difficulty ?: $difficulty,
+        difficulty => $difficulty,
         last_hash => $last_hash,
         reward => $reward,
         address => $gas_address,
