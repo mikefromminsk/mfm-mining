@@ -27,23 +27,26 @@ function openMining(domain, success) {
                     if ($scope.in_progress && startMiningAfterRequest)
                         startMiningProcess(response.last_hash, response.difficulty)
                 })
+                loadTrans()
                 loadAccounts()
             }
 
             $scope.startMining = function () {
-                postContract("mfm-token", "account.php", {
-                    domain: wallet.gas_domain,
-                    address: wallet.address(),
-                }, function (response) {
-                    if (response.balance > 0) {
-                        getPin(function (pin) {
-                            window.pinForSesstion = pin
-                            $scope.in_progress = true
-                            loadMiningInfo(true)
+                getPin(function (pin) {
+                    window.pinForSesstion = pin
+                    $scope.in_progress = true
+                    wallet.calcPass(domain, pin, function (pass) {
+                        postContract("mfm-token", "account.php", {
+                            domain: wallet.gas_domain,
+                            address: wallet.address(),
+                        }, function (response) {
+                            if (response.balance > 0) {
+                                loadMiningInfo(true)
+                            } else {
+                                openAskCredit(wallet.gas_domain, init)
+                            }
                         })
-                    } else {
-                        openAskCredit(wallet.gas_domain, init)
-                    }
+                    })
                 })
             }
 
@@ -130,17 +133,12 @@ function openMining(domain, success) {
 
             function init() {
                 loadProfile()
-                loadTrans()
                 loadMiningInfo()
-                loadAccounts()
                 get("/mfm-mining/readme.md", function (text) {
                     setMarkdown("mfm-mining-readme", text)
                 })
             }
 
-            setTimeout(function () {
-                startRainbow("rainbow")
-            }, 100)
             init()
         }
     )
