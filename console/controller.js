@@ -11,7 +11,7 @@ function openMining(domain, success) {
             $scope.speed = 0
 
             if (window.conn != null && window.conn.readyState !== WebSocket.OPEN) {
-                showError("Your Websocket is not connected.")
+                showError(str.web_socket_not_connected)
             }
 
             function loadMiningInfo(startMiningAfterRequest) {
