@@ -28,7 +28,7 @@ if (gmp_strval($gmp) == "0") {
     $time_diff = $interval - $need_interval;
 
     $axelerate = 0;
-    $difficulty_history = dataHistory([mining, $domain, difficulty], 0, 50);
+    $difficulty_history = dataHistory([mining, $domain, difficulty], 0, 20);
     for ($i = 1; $i < sizeof($difficulty_history); $i++) {
         if ($difficulty_history[$i] > $difficulty_history[$i - 1])
             $axelerate += 1;
