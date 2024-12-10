@@ -1,9 +1,13 @@
 function openMining(domain, success) {
+    trackCall(arguments)
     let worker;
+    let restartTimer;
     if (domain == null) return;
     showDialog('/mfm-mining/console/index.html', function () {
             if (worker)
                 worker.terminate()
+            if (restartTimer)
+                clearTimeout(restartTimer)
             if (success)
                 success()
         }, function ($scope) {
@@ -33,6 +37,10 @@ function openMining(domain, success) {
 
             $scope.startMining = function () {
                 getPin(function (pin) {
+                    storage.setString(storageKeys.mining_auto_start, "1")
+                    restartTimer = setTimeout(function () {
+                        window.location.reload()
+                    }, 1000 * 60 * 10)
                     window.pinForSesstion = pin
                     $scope.in_progress = true
                     wallet.calcPass(domain, pin, function (pass) {
@@ -88,6 +96,9 @@ function openMining(domain, success) {
                 if (worker != null)
                     worker.terminate()
                 $scope.in_progress = false
+                storage.setString(storageKeys.mining_auto_start, "")
+                if (restartTimer)
+                    clearTimeout(restartTimer)
             }
 
             $scope.subscribe("mining", function (data) {
@@ -140,6 +151,10 @@ function openMining(domain, success) {
             }
 
             init()
+
+            if (storage.getString(storageKeys.mining_auto_start) != "") {
+                $scope.startMining()
+            }
         }
     )
 

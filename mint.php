@@ -24,7 +24,7 @@ if (gmp_strval($gmp) == "0") {
     $reward = getReward($domain);
     tokenSend($domain, mining, $gas_address, $reward);
     $interval = time() - dataInfo([mining, $domain, last_hash])[data_time];
-    $need_interval = 5;
+    $need_interval = 60;
     $time_diff = $interval - $need_interval;
 
     $axelerate = 0;
