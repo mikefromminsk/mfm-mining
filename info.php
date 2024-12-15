@@ -6,7 +6,7 @@ $address = get_required(address);
 
 $response[last_hash] = dataGet([mining, $domain, last_hash]) ?: "";
 $response[difficulty] = dataGet([mining, $domain, difficulty]) ?: 1;
-$response[bank] = tokenBalance($domain, mining);
+$response[bank] = tokenBalance($domain, mining) ?: 0;
 $response[last_reward] = getReward($domain);
 
 commit($response);

@@ -14,7 +14,10 @@
                  style="position: relative; padding-top: 100px">
                 <p class="size12 uppercase">{{str.last_reward}}</p>
                 <p class="size40 bold">{{formatAmount(last_reward, domain, 0)}}</p>
-                <p class="size12">{{formatAmount(bank, domain)}} {{str.in_bank}}</p>
+                <p class="size12"
+                   ng-class="{'text-red': bank == 0}">
+                    {{formatAmount(bank, domain)}} {{str.in_bank}}
+                </p>
                 <p class="size10 mt8">{{str.difficulty}} {{formatAmount(difficulty, '', 2)}}</p>
                 <p class="size10 mt8">{{str.speed}} {{formatAmount(speed, '', 2)}} h/s</p>
 
@@ -60,7 +63,7 @@
                 <div class="row">
                     <div class="flex primary-button"
                          ng-click="startMining()"
-                         ng-disabled="balance == 0"
+                         ng-disabled="balance == 0 || bank == 0 || !loaded"
                          ng-hide="in_progress">
                         {{str.start}}
                     </div>

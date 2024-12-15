@@ -23,6 +23,7 @@ function openMining(domain, success) {
                     domain: domain,
                     address: wallet.address(),
                 }, function (response) {
+                    $scope.loaded = true
                     $scope.difficulty = response.difficulty
                     $scope.last_reward = response.last_reward
                     $scope.last_hash = response.last_hash
